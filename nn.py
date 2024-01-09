@@ -3,6 +3,7 @@ from keras import layers
 
 from tensorflow.keras.layers import Input, Dense, Layer
 from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras import initializers
 
 
 activation = ["linear", #raw input
@@ -16,7 +17,6 @@ activation = ["linear", #raw input
               ]
 
 
-maxEpoch = 10
 i = 0
 
 #functional
@@ -30,34 +30,35 @@ i = 0
 #sequential
 model = Sequential()
 model.add(Input(shape=(2,)))
-model.add(layers.Dense(units=2, activation=activation[i]))
-model.add(layers.Dense(units=1))
+model.add(layers.Dense(units=2,kernel_initializer=initializers.Ones())) 
+model.add(layers.Dense(units=1,activation=activation[i],kernel_initializer=initializers.Ones()))
 
 model.summary()
 
-model.compile(loss='categorical_crossentropy', optimizer='nadam')
-
+#model.compile(loss='categorical_crossentropy')#optimizer='nadam')
+model.compile(loss='MeanSquaredError')
 
 ll = len(model.layers)
 lw = len(model.weights)
 print("numbers of layers = ", ll)
 print("Number of weights after calling the model:",lw)
 
+print()
+print()
 
+maxEpoch = 100
 
 #OR
 inputs = np.asarray([[1,1], [0,0], [1,0], [0,1]])
+assert not np.any(np.isnan(inputs))
 expected = np.asarray([[1], [0], [1], [1]])
-model.fit(
-    inputs,
-    expected, 
-    epochs=maxEpoch
-)
+model.fit(inputs,expected,epochs=maxEpoch)
+
+#test_scores = model.evaluate(inputs,expected)
+print(inputs)
+print(model.predict(inputs))
+#print("Test loss:", test_scores)
+
+#print("Test accuracy:", test_scores[1])
 
 
-
-
-#inputs = tf.keras.Input(shape=(3,))
-#x = tf.keras.layers.Dense(4, activation=tf.nn.relu)(inputs)
-#outputs = tf.keras.layers.Dense(5, activation=tf.nn.softmax)(x)
-#model = tf.keras.Model(inputs=inputs, outputs=outputs)
