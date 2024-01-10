@@ -5,6 +5,9 @@ from tensorflow.keras.layers import Input, Dense, Layer
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras import initializers
 
+from prettytable import PrettyTable
+table = PrettyTable()
+table.field_names = ["Num Hidden Layers","Hidden Layer Size","ePoch","Activation Function","Accuracy"]
 
 activation = ["linear", #raw input
               "relu", #max(x, 0)
@@ -17,7 +20,7 @@ activation = ["linear", #raw input
               ]
 
 
-i = 0
+i = 2
 
 #functional
 #inputs = Input(shape=(2,))
@@ -30,13 +33,13 @@ i = 0
 #sequential
 model = Sequential()
 model.add(Input(shape=(2,)))
-model.add(layers.Dense(units=2,kernel_initializer=initializers.Ones())) 
-model.add(layers.Dense(units=1,activation=activation[i],kernel_initializer=initializers.Ones()))
+model.add(layers.Dense(units=2,activation=activation[1]))#kernel_initializer=initializers.Ones())) 
+model.add(layers.Dense(units=1,activation=activation[2]))#kernel_initializer=initializers.Ones()))
 
 model.summary()
 
-#model.compile(loss='categorical_crossentropy')#optimizer='nadam')
-model.compile(loss='MeanSquaredError')
+model.compile(loss='MeanSquaredError',metrics = ['accuracy'],optimizer='nadam')
+
 
 ll = len(model.layers)
 lw = len(model.weights)
@@ -46,18 +49,23 @@ print("Number of weights after calling the model:",lw)
 print()
 print()
 
-maxEpoch = 100
+maxEpoch = 200
 
 #OR
 inputs = np.asarray([[1,1], [0,0], [1,0], [0,1]])
 assert not np.any(np.isnan(inputs))
 expected = np.asarray([[1], [0], [1], [1]])
-model.fit(inputs,expected,epochs=maxEpoch)
+history = model.fit(inputs,expected,epochs=maxEpoch)
 
-#test_scores = model.evaluate(inputs,expected)
 print(inputs)
 print(model.predict(inputs))
-#print("Test loss:", test_scores)
+test_scores = model.evaluate(inputs,expected)
+print("Test loss:", test_scores)
+print(history.history['accuracy'][-1])
+
+#"Num Hidden Layers","Hidden Layer Size","ePoch","Activation Function","Accuracy"]
+table.add_row([ll-1,model.layers[0].output_shape[1],maxEpoch,activation[i],test_scores[1]])
+print(table)
 
 #print("Test accuracy:", test_scores[1])
 
