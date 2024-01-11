@@ -4,6 +4,9 @@ from keras import layers
 from tensorflow.keras.layers import Input, Dense, Layer
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras import initializers
+from tensorflow.keras.optimizers import SGD
+
+
 
 from prettytable import PrettyTable
 table = PrettyTable()
@@ -13,10 +16,10 @@ activation = ["linear", #raw input
               "relu", #max(x, 0)
               "sigmoid", # sigmoid(x) = 1 / (1 + exp(-x))
               "softmax", #exp(x) / sum(exp(x))
-              "softplus", #log(exp(x) + 1)
-              "softsign", #x / (abs(x) + 1)
-              "tanh", #sinh(x) / cosh(x)
-              "hard_sigmoid", #0 if x < -2.5  || 1 if x > 2.5 || 0.2 * x + 0.5 if -2.5 <= x <= 2.5
+              #"softplus", #log(exp(x) + 1)
+              #"softsign", #x / (abs(x) + 1)
+              #"tanh", #sinh(x) / cosh(x)
+              #"hard_sigmoid", #0 if x < -2.5  || 1 if x > 2.5 || 0.2 * x + 0.5 if -2.5 <= x <= 2.5
               ]
 
 
@@ -33,12 +36,13 @@ i = 2
 #sequential
 model = Sequential()
 model.add(Input(shape=(2,)))
-model.add(layers.Dense(units=2,activation=activation[1]))#kernel_initializer=initializers.Ones())) 
+model.add(layers.Dense(units=10,activation=activation[2]))#kernel_initializer=initializers.Ones())) 
 model.add(layers.Dense(units=1,activation=activation[2]))#kernel_initializer=initializers.Ones()))
 
 model.summary()
 
-model.compile(loss='MeanSquaredError',metrics = ['accuracy'],optimizer='nadam')
+opt = SGD(lr=0.1)
+model.compile(loss='MeanSquaredError',metrics = ['accuracy'],optimizer='adam')#=opt)
 
 
 ll = len(model.layers)
@@ -49,7 +53,9 @@ print("Number of weights after calling the model:",lw)
 print()
 print()
 
-maxEpoch = 200
+n = 6
+ep = [10,20,50,100,200,300,500]
+maxEpoch = ep[n]
 
 #OR
 inputs = np.asarray([[1,1], [0,0], [1,0], [0,1]])
